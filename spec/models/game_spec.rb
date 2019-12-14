@@ -9,10 +9,5 @@ RSpec.describe Game, type: :model do
     it { should validate_numericality_of(:current_player).only_integer }
     it { should validate_numericality_of(:current_frame).only_integer }
     it { should validate_inclusion_of(:current_frame).in_range(1..10) }
-    it do
-      should allow_value('running', 'ended')
-        .for(:state)
-        .with_message('State must be running or ended')
-    end
   end
 end
