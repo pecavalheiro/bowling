@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Game, type: :model do
   describe 'validations' do
+    it { should have_many(:frames) }
     it { should validate_presence_of(:player1) }
     it { should validate_numericality_of(:current_player).only_integer }
     it { should validate_numericality_of(:current_frame).only_integer }
