@@ -3,9 +3,9 @@
 class Frame < ApplicationRecord
   belongs_to :game
 
-  validates :game_id, :number, :player, presence: true
+  validates :game_id, :number, :player_id, presence: true
 
-  validates_inclusion_of :player, in: [1, 2]
+  validates_inclusion_of :player_id, in: [1, 2]
 
   validates_numericality_of :number, only_integer: true
   validates_inclusion_of :number, in: 1..10

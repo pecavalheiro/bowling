@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_14_192510) do
+ActiveRecord::Schema.define(version: 2019_12_14_202600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2019_12_14_192510) do
     t.integer "ball_1"
     t.integer "ball_2"
     t.integer "ball_extra"
-    t.integer "player"
+    t.integer "player_id"
     t.integer "bonus", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -29,8 +29,8 @@ ActiveRecord::Schema.define(version: 2019_12_14_192510) do
   end
 
   create_table "games", force: :cascade do |t|
-    t.string "player1"
-    t.string "player2"
+    t.string "player_1"
+    t.string "player_2"
     t.string "state", default: "running"
     t.integer "current_player", default: 1
     t.integer "current_frame", default: 1

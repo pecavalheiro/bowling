@@ -8,7 +8,7 @@ RSpec.describe GamesController, type: :controller do
   end
 
   let(:invalid_attributes) do
-    { player1: '' }
+    { player_1: '' }
   end
 
   describe 'GET #index' do

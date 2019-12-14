@@ -4,7 +4,7 @@
 # application
 class Game < ApplicationRecord
   has_many :frames
-  validates_presence_of :player1
+  validates_presence_of :player_1
   validates_numericality_of :current_player, only_integer: true
   validates_numericality_of :current_frame, only_integer: true
   validates_inclusion_of :current_frame, in: 1..10

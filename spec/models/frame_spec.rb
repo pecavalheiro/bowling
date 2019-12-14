@@ -6,11 +6,11 @@ RSpec.describe Frame, type: :model do
   describe 'validations' do
     it { should belong_to(:game) }
 
-    %i[game_id number player].each do |field|
+    %i[game_id number player_id].each do |field|
       it { should validate_presence_of(field) }
     end
 
-    it { should validate_inclusion_of(:player).in_range([1, 2]) }
+    it { should validate_inclusion_of(:player_id).in_range([1, 2]) }
 
     it { should validate_numericality_of(:number).only_integer }
     it { should validate_inclusion_of(:number).in_range(1..10) }
