@@ -19,4 +19,8 @@ class Frame < ApplicationRecord
   validates_numericality_of :bonus, only_integer: true,
                                     greater_than_or_equal_to: 0,
                                     less_than_or_equal_to: 20
+
+  def total_points
+    ball_1.to_i + ball_2.to_i + ball_extra.to_i + bonus.to_i
+  end
 end
