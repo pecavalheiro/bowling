@@ -5,7 +5,7 @@ class GamesController < ApplicationController
 
   # GET /games
   def index
-    render json: GameSerializer.new(@game)
+    render json: GameSerializer.new(@game, include: [:frames])
   end
 
   # POST /games

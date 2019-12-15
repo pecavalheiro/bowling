@@ -15,11 +15,18 @@ RSpec.describe GamesController, type: :controller do
     let(:expected_response) do
       { 'data' => { 'id' => Game.last.id.to_s, 'type' => 'game' } }
     end
+    let(:expected_frame) do
+      { 'number' => 1, 'player_id' => 1, 'ball_1' => nil, 'ball_2' => nil,
+        'ball_extra' => nil, 'total_points' => 0 }
+    end
     it 'returns the last game state' do
       Game.create! valid_attributes
       get :index
       expect(response).to be_successful
-      expect(parsed_response).to eq(expected_response)
+      expect(response).to match_json_schema('jsonapi')
+      expect(parsed_response['data'].keys).to eq(%w[id type relationships])
+      expect(parsed_response['included'].first['attributes']).to \
+        eq(expected_frame)
     end
   end
 
