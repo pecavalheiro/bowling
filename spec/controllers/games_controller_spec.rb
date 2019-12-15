@@ -38,8 +38,6 @@ RSpec.describe GamesController, type: :controller do
       it 'renders a JSON response with the new game' do
         post :create, params: { game: valid_attributes }
         expect(response).to have_http_status(:created)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
-        expect(parsed_response).to eq expected_response
       end
     end
 

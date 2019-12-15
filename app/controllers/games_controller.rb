@@ -13,7 +13,7 @@ class GamesController < ApplicationController
     @game = Game.new(game_params)
 
     if @game.save
-      render json: GameSerializer.new(@game), status: :created
+      head :created
     else
       render json: @game.errors, status: :unprocessable_entity
     end
