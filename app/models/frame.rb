@@ -14,7 +14,7 @@ class Frame < ApplicationRecord
             numericality: { only_integer: true,
                             greater_than_or_equal_to: 0,
                             less_than_or_equal_to: 10,
-                            allow_nil: true}
+                            allow_nil: true }
 
   validates_numericality_of :bonus, only_integer: true,
                                     greater_than_or_equal_to: 0,
@@ -22,5 +22,13 @@ class Frame < ApplicationRecord
 
   def total_points
     ball_1.to_i + ball_2.to_i + ball_extra.to_i + bonus.to_i
+  end
+
+  def current_ball=(score)
+    if ball_1.nil?
+      self.ball_1 = score
+    else
+      self.ball_2 = score
+    end
   end
 end
