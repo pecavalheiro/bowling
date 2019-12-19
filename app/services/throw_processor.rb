@@ -20,16 +20,29 @@ class ThrowProcessor < ApplicationService
   end
 
   def next_frame?
-    return true unless current_frame.ball_2.nil? || current_player == 1
+    case current_player
+    when 2
+      return false if (current_frame.number == 10) && spare?
+      return true unless current_frame.ball_2.nil?
+    end
   end
 
   def next_player?
-    return true if strike?
-    return true unless current_frame.ball_2.nil?
+    case current_frame.number
+    when 1..9
+      return true if strike? || current_frame.ball_2?
+    when 10
+      return true unless strike? || spare?
+    end
   end
 
   def strike?
     current_frame.ball_1 == 10
+  end
+
+  def spare?
+    current_frame.ball_1.to_i < 10 &&
+      (current_frame.ball_1.to_i + current_frame.ball_2.to_i) == 10
   end
 
   def change_frame

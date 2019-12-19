@@ -7,57 +7,24 @@ RSpec.describe ThrowProcessor do
     let!(:game) { FactoryBot.create(:game, current_player: player_id) }
     let(:knocked_pins) { 5 }
     let(:next_player) { player_id == 1 ? 2 : 1 }
+    let(:player_id) { 1 }
+    let(:frame_number) { 1 }
+    let(:frame) { Frame.find_by(player_id: player_id, number: frame_number) }
     subject { ThrowProcessor.call(game, knocked_pins) }
 
-    RSpec.shared_examples 'ball 1 of < 10 frame' do |player_id|
-      it 'records the score for the first ball' do
-        subject
-        expect(first_frame.ball_1).to eq 5
-      end
-
-      it "keeps player #{player_id} as current_player" do
-        subject
-        expect(game.reload.current_player).to eq player_id
-      end
-
-      context 'when knocked_pins is 10 (strike)' do
-        let(:knocked_pins) { 10 }
-
-        it 'records the score for first ball' do
-          subject
-          expect(first_frame.ball_1).to eq 10
-        end
-
-        it 'advances to next player without scoring the second ball' do
-          subject
-          expect(game.reload.current_player).to eq next_player
-          expect(first_frame.ball_2).to be_nil
-        end
-      end
-    end
-
-    RSpec.shared_examples 'ball 2 of < 10 frame' do
-      it 'records the score for second ball without changing the first ball' do
-        subject
-        first_frame.reload
-        expect(first_frame.ball_1).to eq 3
-        expect(first_frame.ball_2).to eq 5
-      end
-    end
-
     context 'when current player is 1' do
-      let(:player_id) { 1 }
       context 'and current frame is < 10' do
-        let(:first_frame) { Frame.find_by(player_id: 1, number: 1) }
-        it_behaves_like 'ball 1 of < 10 frame', 1
+
+        it_behaves_like 'frame < 10, ball 1', 1
+
         context 'and current ball is 2' do
           before do
-            first_frame.update(ball_1: 3)
+            frame.update(ball_1: 3)
           end
 
-          it_behaves_like 'ball 2 of < 10 frame'
+          it_behaves_like 'frame < 10, ball 2'
 
-          it 'changes current_player to 2 with the same frame' do
+          it 'changes current_player to 2 in the same frame' do
             subject
             game.reload
             expect(game.current_player).to eq(2)
@@ -65,22 +32,31 @@ RSpec.describe ThrowProcessor do
           end
         end
       end
+
+      context 'and current frame is 10' do
+        let(:frame_number) { 10 }
+
+        before do
+          game.update(current_frame: 10)
+        end
+
+        it_behaves_like 'frame 10, ball 1', 1
+        it_behaves_like 'frame 10, ball 2', 1
+      end
     end
 
     context 'when current player is 2' do
       let(:player_id) { 2 }
 
       context 'and current frame is < 10' do
-        let(:first_frame) { Frame.find_by(player_id: 2, number: 1) }
-
-        it_behaves_like 'ball 1 of < 10 frame', 2
+        it_behaves_like 'frame < 10, ball 1', 2
 
         context 'and current ball is 2' do
           before do
-            first_frame.update(ball_1: 3)
+            frame.update(ball_1: 3)
           end
 
-          it_behaves_like 'ball 2 of < 10 frame'
+          it_behaves_like 'frame < 10, ball 2'
 
           it 'changes current_player to 1 while advancing the frame' do
             subject
@@ -89,6 +65,17 @@ RSpec.describe ThrowProcessor do
             expect(game.current_frame).to eq(2)
           end
         end
+      end
+
+      context 'and current frame is 10' do
+        let(:frame_number) { 10 }
+
+        before do
+          game.update(current_frame: 10)
+        end
+
+        it_behaves_like 'frame 10, ball 1', 2
+        it_behaves_like 'frame 10, ball 2', 2
       end
     end
   end
