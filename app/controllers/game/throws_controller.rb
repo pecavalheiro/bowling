@@ -8,6 +8,8 @@ class Game::ThrowsController < ApplicationController
       ThrowProcessor.call(@game, game_params[:knocked_pins])
     rescue InvalidPinCountError
       return head :unprocessable_entity
+    rescue GameHasEndedError
+      return head :forbidden
     end
 
     head :ok

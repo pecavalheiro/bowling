@@ -46,6 +46,7 @@ RSpec.describe GamesController, type: :controller do
         post :create, params: { game: valid_attributes }
         expect(response).to have_http_status(:created)
       end
+
     end
 
     context 'with invalid params' do

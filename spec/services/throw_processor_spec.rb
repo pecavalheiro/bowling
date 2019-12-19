@@ -14,7 +14,6 @@ RSpec.describe ThrowProcessor do
 
     context 'when current player is 1' do
       context 'and current frame is < 10' do
-
         it_behaves_like 'frame < 10, ball 1', 1
 
         context 'and current ball is 2' do
@@ -42,6 +41,19 @@ RSpec.describe ThrowProcessor do
 
         it_behaves_like 'frame 10, ball 1', 1
         it_behaves_like 'frame 10, ball 2', 1
+
+        context 'and ball 1 + ball 2 < 10' do
+          before do
+            frame.update(ball_1: 1)
+          end
+          let(:knocked_pins) { 7 }
+
+          it 'changes current player to 2 in the same frame' do
+            subject
+            expect(game.current_player).to eq(2)
+            expect(game.current_frame).to eq(10)
+          end
+        end
       end
     end
 
@@ -76,6 +88,30 @@ RSpec.describe ThrowProcessor do
 
         it_behaves_like 'frame 10, ball 1', 2
         it_behaves_like 'frame 10, ball 2', 2
+
+        context 'and ball 1 + ball 2 < 10' do
+          before do
+            frame.update(ball_1: 1)
+          end
+          let(:knocked_pins) { 7 }
+
+          it 'keeps current player and frame' do
+            subject
+            expect(game.current_player).to eq(2)
+            expect(game.current_frame).to eq(10)
+          end
+
+          context 'when throwing a new ball' do
+            before do
+              frame.update(ball_1: 1, ball_2: 5)
+            end
+            it 'raises GameHasEndedError' do
+              expect do
+                ThrowProcessor.call(game, 4)
+              end.to raise_error(GameHasEndedError)
+            end
+          end
+        end
       end
     end
   end

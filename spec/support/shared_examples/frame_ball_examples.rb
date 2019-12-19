@@ -37,6 +37,18 @@ RSpec.shared_examples 'frame 10, ball 2' do |player_id|
       expect(game.current_frame).to eq(10)
     end
   end
+
+  context 'and ball 1 + ball 2 < 10' do
+    before do
+      frame.update(ball_1: 1)
+    end
+    let(:knocked_pins) { 7 }
+
+    it 'records the score' do
+      subject
+      expect(frame.reload.ball_2).to eq 7
+    end
+  end
 end
 
 RSpec.shared_examples 'frame < 10, ball 1' do |player_id|
