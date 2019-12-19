@@ -6,18 +6,32 @@ RSpec.describe ThrowProcessor do
   describe '#call' do
     let!(:game) { FactoryBot.create(:game, current_player: player_id) }
     let(:knocked_pins) { 5 }
+    let(:next_player) { player_id == 1 ? 2 : 1 }
     subject { ThrowProcessor.call(game, knocked_pins) }
 
     RSpec.shared_examples 'ball 1 of < 10 frame' do |player_id|
-      context 'when current ball is 1' do
-        it 'records the score for the first ball' do
+      it 'records the score for the first ball' do
+        subject
+        expect(first_frame.ball_1).to eq 5
+      end
+
+      it "keeps player #{player_id} as current_player" do
+        subject
+        expect(game.reload.current_player).to eq player_id
+      end
+
+      context 'when knocked_pins is 10 (strike)' do
+        let(:knocked_pins) { 10 }
+
+        it 'records the score for first ball' do
           subject
-          expect(first_frame.ball_1).to eq 5
+          expect(first_frame.ball_1).to eq 10
         end
 
-        it "keeps player #{player_id} as current_player" do
+        it 'advances to next player without scoring the second ball' do
           subject
-          expect(game.reload.current_player).to eq player_id
+          expect(game.reload.current_player).to eq next_player
+          expect(first_frame.ball_2).to be_nil
         end
       end
     end
@@ -33,10 +47,10 @@ RSpec.describe ThrowProcessor do
 
     context 'when current player is 1' do
       let(:player_id) { 1 }
-      context 'when current frame is < 10' do
+      context 'and current frame is < 10' do
         let(:first_frame) { Frame.find_by(player_id: 1, number: 1) }
         it_behaves_like 'ball 1 of < 10 frame', 1
-        context 'when current ball is 2' do
+        context 'and current ball is 2' do
           before do
             first_frame.update(ball_1: 3)
           end
@@ -56,12 +70,12 @@ RSpec.describe ThrowProcessor do
     context 'when current player is 2' do
       let(:player_id) { 2 }
 
-      context 'when current frame is < 10' do
+      context 'and current frame is < 10' do
         let(:first_frame) { Frame.find_by(player_id: 2, number: 1) }
 
         it_behaves_like 'ball 1 of < 10 frame', 2
 
-        context 'when current ball is 2' do
+        context 'and current ball is 2' do
           before do
             first_frame.update(ball_1: 3)
           end

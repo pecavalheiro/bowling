@@ -24,7 +24,12 @@ class ThrowProcessor < ApplicationService
   end
 
   def next_player?
+    return true if strike?
     return true unless current_frame.ball_2.nil?
+  end
+
+  def strike?
+    current_frame.ball_1 == 10
   end
 
   def change_frame
