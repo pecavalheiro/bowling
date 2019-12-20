@@ -24,7 +24,10 @@ RSpec.describe GamesController, type: :controller do
       get :index
       expect(response).to be_successful
       expect(response).to match_json_schema('jsonapi')
-      expect(parsed_response['data'].keys).to eq(%w[id type relationships])
+      expect(parsed_response['data'].keys).to \
+        eq(%w[id type attributes relationships])
+      expect(parsed_response['data']['attributes'].keys).to \
+        eq(%w[player_1_score player_2_score])
       expect(parsed_response['included'].first['attributes']).to \
         eq(expected_frame)
     end
@@ -46,7 +49,6 @@ RSpec.describe GamesController, type: :controller do
         post :create, params: { game: valid_attributes }
         expect(response).to have_http_status(:created)
       end
-
     end
 
     context 'with invalid params' do

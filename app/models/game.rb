@@ -12,7 +12,19 @@ class Game < ApplicationRecord
 
   after_create :initialize_frames
 
+  def player_1_score
+    player_score(1)
+  end
+
+  def player_2_score
+    player_score(2)
+  end
+
   private
+
+  def player_score(player_id)
+    frames.where(player_id: player_id).map(&:total_points).sum
+  end
 
   def initialize_frames
     add_frames_to_player(1)
