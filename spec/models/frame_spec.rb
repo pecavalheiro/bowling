@@ -37,7 +37,7 @@ RSpec.describe Frame, type: :model do
   describe '.total_points' do
     it 'returns the sum of all ball scores plus bonus' do
       frame = FactoryBot.create(:frame, ball_1: 5, ball_2: 3,
-                                ball_extra: 1, bonus: 2)
+                                        ball_extra: 1, bonus: 2)
       expect(frame.total_points).to eq(11)
     end
   end

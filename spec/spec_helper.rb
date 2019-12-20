@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "json_matchers/rspec"
+require 'json_matchers/rspec'
 
-JsonMatchers.schema_root = "spec/support/api/schemas"
+JsonMatchers.schema_root = 'spec/support/api/schemas'
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
