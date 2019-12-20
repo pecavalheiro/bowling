@@ -13,7 +13,7 @@
 
 *  [PostgreSQL 12](https://www.postgresql.org)  
   
- ##+49 0152 04037352 Installation
+ ### Installation
  
 ```
 # Clone the repo
@@ -27,11 +27,8 @@ rake db:create
 rake db:migrate
 
 ```
-  
 
 ### Running
-
-  
 
 To execute the project, run the following command in your terminal:
 
