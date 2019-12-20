@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe Frame, type: :model do
   describe 'validations' do
     it { should belong_to(:game) }
+    it { should have_many(:bonuses) }
 
     %i[game_id number player_id].each do |field|
       it { should validate_presence_of(field) }

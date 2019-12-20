@@ -2,6 +2,7 @@
 
 class Frame < ApplicationRecord
   belongs_to :game
+  has_many :bonuses
 
   validates :game_id, :number, :player_id, presence: true
 
