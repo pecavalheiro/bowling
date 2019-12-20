@@ -13,6 +13,14 @@ RSpec.describe ThrowProcessor do
     subject { ThrowProcessor.call(game, knocked_pins) }
 
     context 'when current player is 1' do
+      before do
+        allow(BonusProcessor).to receive(:call)
+      end
+
+      after do
+        expect(BonusProcessor).to have_received(:call)
+      end
+
       context 'and current frame is < 10' do
         it_behaves_like 'frame < 10, ball 1', 1
 

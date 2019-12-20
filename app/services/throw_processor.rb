@@ -13,6 +13,7 @@ class ThrowProcessor < ApplicationService
     raise GameHasEndedError if game_has_ended?
 
     score_throw_in_current_frame
+    BonusProcessor.call(current_frame)
     change_player if next_player?
     change_frame if next_frame?
   end
@@ -85,8 +86,8 @@ class ThrowProcessor < ApplicationService
 
   def current_frame
     @current_frame ||= @game.frames
-      .find_by(player_id: current_player,
-               number: @game.current_frame)
+                            .find_by(player_id: current_player,
+                                     number: @game.current_frame)
   end
 
   def current_player
