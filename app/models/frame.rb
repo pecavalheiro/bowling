@@ -27,8 +27,10 @@ class Frame < ApplicationRecord
   def current_ball=(score)
     if ball_1.nil?
       self.ball_1 = score
-    else
+    elsif ball_2.nil?
       self.ball_2 = score
+    else
+      self.ball_extra = score
     end
   end
 end

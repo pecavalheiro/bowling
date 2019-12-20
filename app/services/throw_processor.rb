@@ -18,11 +18,14 @@ class ThrowProcessor < ApplicationService
   end
 
   def game_has_ended?
-    current_player == 2 && \
-      current_frame.number == 10 && \
-      current_frame.ball_1? && \
-      current_frame.ball_2? && \
-      (current_frame.ball_1 + current_frame.ball_2) < 10
+    return if current_frame.number != 10
+    return if current_player == 1 && @game.player_2.present?
+
+    if strike? || spare?
+      return true if current_frame.ball_extra.present?
+    else
+      current_frame.ball_1.present? && current_frame.ball_2.present?
+    end
   end
 
   def score_throw_in_current_frame
@@ -31,19 +34,37 @@ class ThrowProcessor < ApplicationService
   end
 
   def next_frame?
+    return false if (current_frame.number == 10) && (spare? || strike?)
+
     case current_player
+    when 1
+      return false if current_frame.number == 10 || @game.player_2.present?
+      return true if strike?
+      return true if current_frame.ball_2.present?
     when 2
-      return false if (current_frame.number == 10) && spare?
+      return true if strike?
       return true unless current_frame.ball_2.nil? || current_frame.number == 10
     end
   end
 
   def next_player?
+    return unless @game.player_2.present?
+
     case current_frame.number
     when 1..9
-      return true if strike? || current_frame.ball_2?
+      # strike skips the second ball
+      return true if strike? || current_frame.ball_2.present?
     when 10
-      return true if current_frame.ball_2? && !spare? && current_player != 2
+      # only change player if current player = 1
+      # after last throw of player 2, game state is kept as is
+      return if current_player == 2
+
+      # if player scores strike or spare, gets a bonus throw
+      if spare? || strike?
+        return true if current_frame.ball_extra.present?
+      else
+        return true if current_frame.ball_2.present?
+      end
     end
   end
 

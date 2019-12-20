@@ -23,11 +23,54 @@ RSpec.describe ThrowProcessor do
 
           it_behaves_like 'frame < 10, ball 2'
 
-          it 'changes current_player to 2 in the same frame' do
-            subject
-            game.reload
-            expect(game.current_player).to eq(2)
-            expect(game.current_frame).to eq(1)
+          context 'and player 2 exists' do
+            it 'changes current_player to 2 in the same frame' do
+              subject
+              game.reload
+              expect(game.current_player).to eq(2)
+              expect(game.current_frame).to eq(1)
+            end
+
+            context 'when total knocked_pins = 0' do
+              let(:knocked_pins) { 0 }
+
+              before do
+                frame.update(ball_1: 0)
+              end
+
+              it 'changes the current_player without changing frame' do
+                subject
+                game.reload
+                expect(game.current_player).to eq(next_player)
+                expect(game.current_frame).to eq(1)
+              end
+            end
+          end
+          context 'and player 2 does not exist' do
+            let!(:game) do
+              FactoryBot.create(:game,
+                                current_player: player_id,
+                                player_2: nil)
+            end
+            it 'keeps current player while advancing the frame' do
+              subject
+              expect(game.current_player).to eq(1)
+              expect(game.current_frame).to eq(2)
+            end
+            context 'when total knocked_pins = 0' do
+              let(:knocked_pins) { 0 }
+
+              before do
+                frame.update(ball_1: 0)
+              end
+
+              it 'keeps the current_player while advancing frame' do
+                subject
+                game.reload
+                expect(game.current_player).to eq(1)
+                expect(game.current_frame).to eq(2)
+              end
+            end
           end
         end
       end
@@ -41,6 +84,62 @@ RSpec.describe ThrowProcessor do
 
         it_behaves_like 'frame 10, ball 1', 1
         it_behaves_like 'frame 10, ball 2', 1
+
+        context 'when throwing the extra ball' do
+          before do
+            frame.update(ball_1: 10, ball_2: 10)
+          end
+          it 'changes the player to 2 without changing the frame' do
+            subject
+            game.reload
+            expect(game.current_player).to eq(2)
+            expect(game.current_frame).to eq(10)
+          end
+        end
+
+        context 'and player 2 does not exist' do
+          let!(:game) do
+            FactoryBot.create(:game,
+                              current_player: player_id,
+                              player_2: nil)
+          end
+
+          context 'and ball 1 + ball 2 = 0' do
+            before do
+              frame.update(ball_1: 0)
+            end
+            let(:knocked_pins) { 0 }
+
+            it 'records the score' do
+              subject
+              expect(frame.reload.ball_2).to eq 0
+            end
+          end
+
+          context 'and first throw score = 10 (strike)' do
+            let(:knocked_pins) { 5 }
+
+            before do
+              frame.update(ball_1: 10)
+            end
+
+            it 'keeps the player and frame, allowing a third throw' do
+              subject
+              expect(game.current_player).to eq(1)
+              expect(game.current_frame).to eq(10)
+            end
+
+            context 'extra throw' do
+              before do
+                frame.update(ball_1: 10, ball_2: 5)
+              end
+              it 'records the score' do
+                subject
+                expect(frame.reload.ball_extra).to eq 5
+              end
+            end
+          end
+        end
 
         context 'and ball 1 + ball 2 < 10' do
           before do
@@ -63,6 +162,17 @@ RSpec.describe ThrowProcessor do
       context 'and current frame is < 10' do
         it_behaves_like 'frame < 10, ball 1', 2
 
+        context 'and knocked_pins is 10 (strike)' do
+          let(:knocked_pins) { 10 }
+
+          it 'changes current_player to 1 while advancing the frame' do
+            subject
+            game.reload
+            expect(game.current_player).to eq(1)
+            expect(game.current_frame).to eq(2)
+          end
+        end
+
         context 'and current ball is 2' do
           before do
             frame.update(ball_1: 3)
@@ -75,6 +185,21 @@ RSpec.describe ThrowProcessor do
             game.reload
             expect(game.current_player).to eq(1)
             expect(game.current_frame).to eq(2)
+          end
+
+          context 'when total knocked_pins = 0' do
+            let(:knocked_pins) { 0 }
+
+            before do
+              frame.update(ball_1: 0)
+            end
+
+            it 'changes the current_player while advancing frame' do
+              subject
+              game.reload
+              expect(game.current_player).to eq(next_player)
+              expect(game.current_frame).to eq(2)
+            end
           end
         end
       end
