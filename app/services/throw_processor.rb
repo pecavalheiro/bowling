@@ -3,6 +3,12 @@
 class ThrowProcessor < ApplicationService
   attr_reader :game, :knocked_pins
 
+  def initialize(game, knocked_pins)
+    @game = game
+    @knocked_pins = knocked_pins
+    set_internals
+  end
+
   def call
     raise GameHasEndedError if game_has_ended?
 
@@ -70,5 +76,20 @@ class ThrowProcessor < ApplicationService
   def change_player
     @game.current_player = (@game.current_player == 1 ? 2 : 1)
     @game.save!
+  end
+
+  def set_internals
+    current_frame
+    current_player
+  end
+
+  def current_frame
+    @current_frame ||= @game.frames
+      .find_by(player_id: current_player,
+               number: @game.current_frame)
+  end
+
+  def current_player
+    @current_player ||= @game.current_player
   end
 end
